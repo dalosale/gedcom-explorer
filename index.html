@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Бесплатный и безопасный онлайн просмотрщик GEDCOM. Загрузите своё генеалогическое древо (.ged), изучайте предков и потомков, создавайте диаграммы без отправки данных на сервер.">
+    <meta property="og:title" content="GEDCOM Explorer - Бесплатный просмотрщик семейного древа">
+    <meta property="og:description" content="Изучайте историю своей семьи. Бесплатный, безопасный и приватный инструмент для файлов .ged.">
+    <meta property="og:type" content="website">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="GEDCOM Explorer">
+    <meta name="keywords" content="gedcom просмотрщик, бесплатный gedcom просмотрщик, семейное древо онлайн, генеалогическое ПО, чтение .ged файлов, приватность">
+    <title>GEDCOM Explorer | Бесплатный онлайн просмотрщик семейного древа</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+        /* --- ТЕМА И ПЕРЕМЕННЫЕ --- */
+        :root {
+            --bg-deep: #f2f0e9;
+            --bg-image: linear-gradient(135deg, #f2f0e9 0%, #e6e2d6 100%);
+            --glass-bg: rgba(255, 255, 255, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --glass-highlight: #ffffff;
+            --text-main: #3d3a36;
+            --text-sub: #78736b;
+            --text-accent: #5c7a8a;
+            --accent-m-bg: #dbe4e8; --accent-m-text: #537c8e; --accent-m-border: #b0c4cd;
+            --accent-f-bg: #e8dbdf; --accent-f-text: #a86b7e; --accent-f-border: #cdb0b9;
+            --focus-banner: linear-gradient(135deg, #5d4d42, #3e332c);
+            --focus-card-bg: rgba(253, 251, 247, 0.95);
+            --upload-bg: rgba(242, 240, 233, 0.98);
+            --spouse-bg: rgba(0, 0, 0, 0.03);
+            --spouse-border: rgba(0, 0, 0, 0.05);
+            --indicator-color: #beb8b0;
+            --indicator-bg: rgba(0, 0, 0, 0.02);
+            --indicator-text: #a8a29e;
+            --indicator-hover-bg: rgba(0, 0, 0, 0.05);
+            --indicator-hover-text: #78736b;
+            --gen-gray: #a8a29e; --gen-orange: #cd8b65; --gen-yellow: #cbb368;
+            --gen-green: #8ab094; --gen-cyan: #7b9eb5; --gen-indigo: #9890c2;
+            --timeline-track: #ccc5b9; --timeline-text: #78736b; --timeline-focus-border: #f2f0e9;
+            --fav-gold: #c7a049; --danger-color: #c25e5e;
+            --w-center: 360px; --gap: 8px;
+            --header-el-bg: rgba(255, 255, 255, 0.15);
+            --header-el-border: rgba(255, 255, 255, 0.25);
+            --header-el-text: rgba(255, 255, 255, 0.9);
+            --header-el-hover-bg: rgba(255, 255, 255, 0.25);
+            --header-el-hover-text: #ffffff;
+            --dock-bg: rgba(0, 0, 0, 0.25);
+        }
+
+        [data-theme="dark"] {
+            --bg-deep: #262524;
+            --bg-image: radial-gradient(circle at 50% 0%, #3a3836, #1c1b1a);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-highlight: rgba(255, 255, 255, 0.08);
+            --text-main: #e6e0d4;
+            --text-sub: #99948d;
+            --text-accent: #8da399;
+            --accent-m-bg: rgba(83, 124, 142, 0.2); --accent-m-text: #8fbcd4; --accent-m-border: rgba(143, 188, 212, 0.3);
+            --accent-f-bg: rgba(168, 107, 126, 0.2); --accent-f-text: #d4a3b1; --accent-f-border: rgba(212, 163, 177, 0.3);
+            --focus-banner: linear-gradient(135deg, #5d4d42, #3e332c);
+            --focus-card-bg: rgba(38, 37, 36, 0.9);
+            --upload-bg: #1c1b1a;
+            --spouse-bg: rgba(0, 0, 0, 0.3);
+            --spouse-border: rgba(255, 255, 255, 0.05);
+            --indicator-color: rgba(255,255,255,0.15);
+            --indicator-bg: rgba(255, 255, 255, 0.02);
+            --indicator-text: #57534e;
+            --indicator-hover-bg: rgba(255, 255, 255, 0.08);
+            --indicator-hover-text: #a8a29e;
+            --gen-gray: #78716c; --gen-orange: #a66a4e; --gen-yellow: #a39055;
+            --gen-green: #688570; --gen-cyan: #5b768a; --gen-indigo: #726c91;
+            --timeline-track: rgba(255,255,255,0.15); --timeline-text: #99948d; --timeline-focus-border: #262524;
+            --fav-gold: #d4b46a; --danger-color: #b85c5c;
+            --header-el-bg: rgba(255, 255, 255, 0.1);
+            --header-el-border: rgba(255, 255, 255, 0.15);
+            --header-el-text: rgba(255, 255, 255, 0.8);
+            --dock-bg: rgba(255, 255, 255, 0.1);
+        }
+
+        * { box-sizing: border-box; transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-deep); background-image: var(--bg-image); color: var(--text-main); margin: 0; min-height: 100vh; width: 100vw; display: flex; flex-direction: column; overflow-x: hidden; position: relative; }
+
+        /* СТРАНИЦА ПРИВЕТСТВИЯ */
+        .landing-container { width: 100%; display: flex; flex-direction: column; overflow-y: auto; background: var(--bg-deep); }
+        .hero-section { padding: 80px 20px; text-align: center; min-height: 80vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 70%); }
+        .seo-content { max-width: 900px; margin: 0 auto; padding: 40px 20px; line-height: 1.8; font-size: 1.05rem; }
+        .seo-content h2 { font-size: 2rem; margin-bottom: 25px; color: var(--text-main); border-bottom: 2px solid var(--text-accent); padding-bottom: 10px; display: inline-block; }
+        .seo-content h3 { font-size: 1.6rem; margin-top: 50px; margin-bottom: 20px; color: var(--text-accent); }
+        .seo-content h4 { font-size: 1.2rem; margin-top: 30px; margin-bottom: 10px; color: var(--text-main); font-weight: 700; }
+        .seo-content p { margin-bottom: 20px; color: var(--text-sub); }
+        .seo-content ul { margin-bottom: 25px; padding-left: 25px; color: var(--text-sub); }
+        .seo-content li { margin-bottom: 12px; }
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; margin-top: 50px; margin-bottom: 50px; }
+        .feature-box { padding: 30px; background: var(--glass-bg); border-radius: 12px; border: 1px solid var(--glass-border); transition: transform 0.3s; }
+        .feature-box:hover { transform: translateY(-5px); }
+        .feature-icon { font-size: 40px; margin-bottom: 20px; display: block; }
+        .feature-title { font-weight: 700; font-size: 20px; margin-bottom: 15px; color: var(--text-main); }
+        .footer-legal { margin-top: 50px; padding: 50px 20px; text-align: center; border-top: 1px solid var(--glass-border); font-size: 0.95rem; color: var(--text-sub); background: rgba(0,0,0,0.02); }
+        .footer-legal a { color: var(--text-accent); text-decoration: none; margin: 0 15px; font-weight: 500; }
+        .footer-legal a:hover { text-decoration: underline; color: var(--text-main); }
+        
+        /* ИНТЕРФЕЙС ПРИЛОЖЕНИЯ */
+        #appInterface { display: none; height: 100vh; flex-direction: column; width: 100%; }
+        .top-bar { height: 70px; display: flex; align-items: center; justify-content: space-between; z-index: 20; padding: 0 20px; flex-shrink: 0; background: var(--focus-banner); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 20px rgba(0,0,0,0.15); position: relative; color: #fff; }
+        .mode-area { width: 60px; height: 100%; display: flex; align-items: center; justify-content: center; border-right: 1px solid rgba(255,255,255,0.1); margin-right: 15px; }
+        #btnCalendar { background: transparent; border: none; font-size: 28px; cursor: pointer; color: #fff; transition: transform 0.3s; opacity: 0.9; }
+        #btnCalendar:hover { transform: scale(1.2); opacity: 1; text-shadow: 0 0 15px rgba(255,255,255,0.6); }
+        .nav-left { display: flex; gap: 10px; align-items: center; height: 100%; flex: 0 0 auto;}
+        .nav-right { display: flex; align-items: center; gap: 15px; flex: 0 0 auto; }
+        .stats-badge { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.9); padding: 6px 12px; border-radius: 20px; background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.2); white-space: nowrap; box-shadow: 0 1px 2px rgba(0,0,0,0.1); display: none; margin-left: 15px; }
+        .stats-badge strong { color: #fff; }
+        .app-logo { font-size: 18px; font-weight: 800; color: rgba(255,255,255,0.95); margin-right: 15px; letter-spacing: -0.5px; text-shadow: 0 1px 3px rgba(0,0,0,0.1); display: none; }
+        @media (min-width: 900px) { .app-logo { display: block; } }
+        .app-logo span { color: #b8d4c5; transition: color 0.4s; }
+        .nav-btn { background: var(--header-el-bg); border: 1px solid var(--header-el-border); color: var(--header-el-text); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 20px; transition: all 0.2s; position: relative; }
+        .nav-btn:hover:not(:disabled) { background: var(--header-el-hover-bg); color: var(--header-el-hover-text); transform: translateY(-1px); border-color: var(--header-el-hover-bg); }
+        .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .fav-dropdown { position: absolute; top: 50px; right: 0; width: 260px; background: var(--focus-card-bg); border: 1px solid var(--glass-border); border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); backdrop-filter: blur(20px); z-index: 100; display: none; flex-direction: column; overflow: hidden; color: var(--text-main); }
+        .fav-dropdown.show { display: flex; animation: fadeMe 0.2s ease-out; }
+        @keyframes fadeMe { from { opacity: 0; margin-top: -5px; } to { opacity: 1; margin-top: 0; } }
+        .fav-header { padding: 10px 15px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-sub); border-bottom: 1px solid var(--glass-border); background: var(--glass-bg); letter-spacing: 1px; }
+        .fav-list { overflow-y: auto; max-height: 300px; }
+        .fav-item { padding: 10px 15px; border-bottom: 1px solid var(--glass-border); cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--text-main); }
+        .fav-item:last-child { border-bottom: none; }
+        .fav-item:hover { background: var(--indicator-hover-bg); }
+        .fav-item .remove-fav { opacity: 0.4; font-size: 16px; margin-left: 10px; }
+        .fav-item .remove-fav:hover { opacity: 1; color: var(--danger-color); }
+        .fav-empty { padding: 20px; text-align: center; color: var(--text-sub); font-size: 12px; font-style: italic; }
+        .fav-footer { padding: 10px; border-top: 1px solid var(--glass-border); background: var(--glass-bg); display: flex; justify-content: center; }
+        .btn-clear-favs { background: transparent; border: 1px solid var(--danger-color); color: var(--danger-color); font-size: 11px; font-weight: 600; padding: 6px 16px; border-radius: 20px; cursor: pointer; transition: all 0.2s; }
+        .btn-clear-favs:hover { background: var(--danger-color); color: #fff; }
+        .center-nav-container { position: relative; flex: 1; max-width: 600px; margin: 0 20px; display: flex; justify-content: center; align-items: center; }
+        .search-wrapper { position: relative; width: 100%; display: flex; align-items: center; gap: 10px; }
+        .search-input { flex: 1; padding: 12px 20px; border-radius: 8px; border: 1px solid var(--header-el-border); background: var(--header-el-bg); font-size: 13px; color: var(--header-el-hover-text); transition: all 0.3s; min-width: 0; }
+        .search-input:focus { outline: none; border-color: rgba(255,255,255,0.5); background: var(--header-el-hover-bg); }
+        .search-input::placeholder { color: rgba(255,255,255,0.6); }
+        .search-results { position: absolute; top: 55px; left: 0; right: 0; background: var(--focus-card-bg); border: 1px solid var(--glass-border); border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); max-height: 300px; overflow-y: auto; display: none; z-index: 100; backdrop-filter: blur(20px); color: var(--text-main); }
+        .result-item { padding: 12px 16px; border-bottom: 1px solid var(--glass-border); cursor: pointer; font-size: 13px; display: flex; justify-content: space-between; color: var(--text-main); }
+        .result-item:hover { background: var(--indicator-hover-bg); }
+        .month-nav-wrapper { display: none; gap: 4px; justify-content: center; width: 100%; align-items: center; flex-wrap: wrap; }
+        .header-month-title { font-size: 20px; font-weight: 800; color: var(--fav-gold); text-transform: uppercase; letter-spacing: 1px; display: none; text-shadow: 0 1px 2px rgba(0,0,0,0.2); margin-left: 15px; white-space: nowrap; }
+        .month-btn { background: var(--header-el-bg); border: 1px solid var(--header-el-border); color: var(--header-el-text); border-radius: 6px; padding: 6px 0; width: 32px; font-size: 10px; font-weight: 700; cursor: pointer; text-transform: uppercase; transition: all 0.2s; text-align: center; margin-bottom: 2px;}
+        .month-btn:hover { background: var(--header-el-hover-bg); color: #ffffff; transform: translateY(-1px); }
+        .navigator-stage { flex: 1; width: 100%; overflow: hidden; display: flex; align-items: flex-start; padding: 10px 10px 70px 10px; }
+        .columns-wrapper { display: flex; align-items: stretch; height: 100%; gap: var(--gap); width: 100%; transition: opacity 0.4s ease; }
+        .column { display: flex; flex-direction: column; gap: 10px; height: 100%; overflow-y: auto; padding-bottom: 20px; flex: 1 1 0; min-width: 250px; }
+        .column::-webkit-scrollbar { width: 6px; }
+        .column::-webkit-scrollbar-track { background: transparent; }
+        .column::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.1); border-radius: 10px; }
+        .column:hover::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.2); }
+        [data-theme="dark"] .column::-webkit-scrollbar-thumb { background-color: rgba(255,255,255,0.1); }
+        [data-theme="dark"] .column:hover::-webkit-scrollbar-thumb { background-color: rgba(255,255,255,0.2); }
+        .w-0 { flex: 0 0 var(--w-center); min-width: var(--w-center); z-index: 10; }
+        .w-3 { opacity: 0.6; filter: grayscale(0.5) blur(0.5px); } .w-2 { opacity: 0.8; } .w-1 { opacity: 1; }
+        .column:hover { opacity: 1; filter: none; }
+        .col-header { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; justify-content: center; min-height: 44px; text-transform: uppercase; font-size: 10px; font-weight: 700; letter-spacing: 1px; background: var(--focus-banner); color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.15); border-radius: 6px; border: none; padding: 0 4px; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .col-count { font-weight: 400; opacity: 0.7; margin-left: 4px; font-size: 0.9em; color: rgba(255,255,255,0.8); }
+        .sub-col-header { display: flex; align-items: center; justify-content: center; min-height: 44px; text-transform: uppercase; font-size: 10px; font-weight: 700; letter-spacing: 1px; background: var(--focus-banner); color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.15); border-radius: 6px; border: none; position: sticky; top: 0; z-index: 4; margin-bottom: 5px; padding: 0 4px; }
+        .parents-col-fix { display: flex !important; flex-direction: column !important; overflow: hidden !important; height: 100%; padding-bottom: 0 !important; }
+        .parents-fixed-area { flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; z-index: 10; padding-bottom: 10px; }
+        .parents-scroll-area { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-bottom: 5px; min-height: 0; position: relative; }
+        .parents-scroll-area::-webkit-scrollbar { width: 6px; }
+        .parents-scroll-area::-webkit-scrollbar-track { background: transparent; }
+        .parents-scroll-area::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.1); border-radius: 10px; }
+        .card { background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-left: 4px solid var(--text-sub); border-radius: 6px; cursor: pointer; display: flex; align-items: center; min-height: 64px; padding: 0; transition: all 0.2s; position: relative; overflow: hidden; }
+        .card:hover { background: var(--glass-highlight); transform: translateY(-1px); box-shadow: 0 3px 10px rgba(0,0,0,0.05); }
+        .indicator-box { width: 20px; flex-shrink: 0; display: flex; justify-content: center; align-items: center; font-size: 14px; font-weight: 800; color: transparent; height: 100%; min-height: 60px; user-select: none; transition: all 0.2s; }
+        .indicator-active { background: var(--indicator-bg); color: var(--indicator-text); }
+        .card:hover .indicator-active { background: var(--indicator-hover-bg); color: var(--indicator-hover-text); }
+        .card-content { flex-grow: 1; display: flex; align-items: center; overflow: hidden; padding: 5px 4px; }
+        .g-minus-3 .card { border-left-color: var(--gen-gray); } .g-minus-2 .card { border-left-color: var(--gen-orange); } .g-minus-1 .card { border-left-color: var(--gen-yellow); } .g-plus-1 .card { border-left-color: var(--gen-green); } .g-plus-2 .card { border-left-color: var(--gen-cyan); } .g-plus-3 .card { border-left-color: var(--gen-indigo); } .g-siblings .card { border-left-color: var(--gen-yellow); }
+        .mini-avatar { width: 34px; height: 34px; background: transparent; border: none; display: flex; justify-content: center; align-items: center; flex-shrink: 0; margin-right: 12px; }
+        .mini-avatar svg { width: 85%; height: 85%; fill: currentColor; } 
+        .avatar-m { color: var(--accent-m-text); } .avatar-f { color: var(--accent-f-text); } .avatar-u { color: var(--text-sub); }
+        .mini-info { display: flex; flex-direction: column; justify-content: center; overflow: hidden; min-width: 0; flex: 1; }
+        .mini-name { font-weight: 600; font-size: 12px; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3; }
+        .mini-date { font-size: 10px; color: var(--text-sub); margin-top: 1px; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .focus-card { background: var(--focus-card-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); display: flex; flex-direction: column; overflow: hidden; height: auto; min-height: 520px; position: relative; }
+        .focus-banner { height: 100px; background: var(--focus-banner); position: relative; }
+        .focus-fav-btn { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.3); backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.5); width: 32px; height: 32px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 18px; color: #fff; cursor: pointer; transition: all 0.2s; z-index: 10; }
+        .focus-fav-btn:hover { background: #fff; color: var(--fav-gold); transform: scale(1.05); }
+        .focus-fav-btn.active { background: #fff; color: var(--fav-gold); border-color: #fff; box-shadow: 0 0 10px rgba(255, 255, 255, 0.4); }
+        .focus-avatar-large { width: 84px; height: 84px; border-radius: 50%; background: var(--bg-deep); position: absolute; bottom: -42px; left: 50%; transform: translateX(-50%); border: 4px solid var(--fav-gold); display: flex; justify-content: center; align-items: center; font-size: 32px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .focus-avatar-large svg { width: 60%; height: 60%; fill: currentColor; } 
+        .focus-body { padding: 55px 24px 24px 24px; text-align: center; overflow-y: auto; }
+        .focus-name { margin-bottom: 2px; color: var(--text-main); word-wrap: break-word; }
+        .name-given { font-size: 28px; font-weight: 900; line-height: 1; }
+        .name-surname { font-size: 28px; font-weight: 900; display: block; line-height: 1; margin-top: 4px; color: var(--text-main); }
+        .name-separator { width: 60%; height: 1px; background: linear-gradient(90deg, transparent 0%, var(--text-sub) 50%, transparent 100%); margin: 10px auto 15px auto; opacity: 0.3; }
+        .focus-fsid { font-size: 12px; color: var(--text-accent); font-weight: 600; margin-bottom: 4px; display: inline-block; letter-spacing: 0.5px; text-decoration: none; transition: opacity 0.2s; border-bottom: 1px dotted var(--text-accent); }
+        .focus-fsid:hover { opacity: 0.7; }
+        .focus-id { font-size: 10px; color: var(--text-sub); font-family: monospace; display: inline-block; background: var(--glass-border); padding: 2px 8px; border-radius: 12px; }
+        .vital-stats { display: flex; gap: 10px; margin-top: 20px; }
+        .vital-column { flex: 1; display: flex; flex-direction: column; gap: 5px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 8px; padding: 12px 10px; text-align: center; cursor: pointer; transition: background-color 0.2s, transform 0.2s; }
+        .vital-column:hover { background-color: var(--indicator-hover-bg); transform: translateY(-2px); border-color: var(--text-sub); }
+        .vital-label { font-size: 10px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .vital-date { font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 2px; }
+        .vital-place-main { font-size: 14px; font-weight: 700; color: var(--text-main); display: block; margin-top: 4px; line-height: 1.2; }
+        .vital-place-sub { font-size: 11px; font-weight: 400; color: var(--text-sub); line-height: 1.3; font-style: italic; display: block; margin-top: 10px; }
+        .spouse-section { margin-top: 25px; text-align: left; background: var(--spouse-bg); border: 1px solid var(--spouse-border); border-radius: 8px; padding: 14px; }
+        .spouse-title { font-size: 10px; font-weight: 700; color: var(--text-accent); text-transform: uppercase; margin-bottom: 8px; border-bottom: 1px solid var(--glass-border); padding-bottom: 4px; letter-spacing: 0.5px;}
+        .spouse-row { margin-bottom: 10px; border-bottom: 1px dashed var(--glass-border); padding-bottom: 8px; cursor: pointer; transition: background-color 0.2s; border-radius: 4px; padding: 6px; }
+        .spouse-row:hover { background-color: var(--indicator-hover-bg); }
+        .spouse-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .spouse-name { font-size: 13px; font-weight: 600; color: var(--text-main); display: block; }
+        .spouse-meta { font-size: 11px; color: var(--text-sub); margin-top: 2px; display: block; font-style: italic;}
+        .focus-note { margin-top: 20px; background: rgba(166, 106, 78, 0.1); border: 1px solid rgba(166, 106, 78, 0.2); color: var(--gen-orange); padding: 10px; border-radius: 8px; font-size: 11px; font-style: italic; text-align: left; line-height: 1.5; max-height: 120px; overflow-y: auto; }
+        .timeline-container { position: fixed; bottom: 0; left: 0; right: 0; height: 70px; background: var(--glass-bg); backdrop-filter: blur(15px); border-top: 1px solid var(--glass-border); z-index: 30; display: flex; align-items: center; justify-content: center; padding: 0 40px; }
+        .timeline-track-wrapper { position: relative; width: 100%; height: 30px; display: flex; align-items: center; }
+        .timeline-line { position: absolute; left: 0; right: 0; height: 2px; background: var(--timeline-track); top: 50%; }
+        .timeline-century { position: absolute; top: 2px; bottom: 2px; width: 1px; background: var(--text-sub); opacity: 0.2; z-index: 0; pointer-events: none; }
+        .timeline-century-label { position: absolute; top: -15px; transform: translateX(-50%); font-size: 9px; font-weight: 700; color: var(--text-sub); opacity: 0.5; pointer-events: none; white-space: nowrap; }
+        .timeline-dot { position: absolute; width: 8px; height: 8px; border-radius: 50%; top: 50%; transform: translate(-50%, -50%); cursor: pointer; transition: all 0.2s; z-index: 2; }
+        .timeline-dot.is-focus { width: 16px; height: 16px; border: 3px solid var(--timeline-focus-border); box-shadow: 0 0 10px var(--text-sub); z-index: 50; }
+        .timeline-dot.active-hover, .timeline-dot:hover { transform: translate(-50%, -50%) scale(1.5); z-index: 60; }
+        .timeline-label { position: absolute; top: -30px; left: 50%; transform: translateX(-50%); font-size: 10px; background: var(--text-main); color: var(--bg-deep); padding: 4px 8px; border-radius: 4px; pointer-events: none; opacity: 0; transition: opacity 0.2s; white-space: nowrap; font-weight: 700; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .timeline-dot.active-hover .timeline-label, .timeline-dot:hover .timeline-label { opacity: 1; }
+        .timeline-year-start, .timeline-year-end { font-size: 11px; font-weight: 700; color: var(--timeline-text); margin: 0 15px; min-width: 40px; }
+        @keyframes highlight-pulse { 0% { background-color: var(--fav-gold); transform: scale(1); box-shadow: 0 0 5px var(--fav-gold); } 50% { background-color: var(--fav-gold); transform: scale(1.02); box-shadow: 0 0 15px var(--fav-gold); } 100% { background-color: var(--glass-bg); transform: scale(1); box-shadow: none; } }
+        .flash-highlight { animation: highlight-pulse 2s ease-out; position: relative; z-index: 50; border-left-color: var(--fav-gold) !important; }
+
+        .upload-title { color: var(--text-main); font-size: 32px; font-weight: 800; margin-bottom: 10px; letter-spacing: -1px; text-align: center; }
+        .upload-sub { color: var(--text-sub); margin-bottom: 40px; font-size: 14px; }
+        .btn-upload { background: var(--text-main); color: var(--bg-deep); padding: 14px 40px; border-radius: 30px; font-weight: 600; cursor: pointer; transition: all 0.3s; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-top: 20px; display: inline-block;}
+        .btn-upload:hover { transform: scale(1.05); }
+
+        .btn-demo { background: transparent; border: 2px solid var(--text-accent); color: var(--text-accent); padding: 12px 30px; border-radius: 30px; font-weight: 700; cursor: pointer; transition: all 0.3s; text-transform: uppercase; letter-spacing: 1px; margin-top: 20px; margin-left: 15px; display: inline-block; font-size: 12px; }
+        .btn-demo:hover { background: var(--text-accent); color: #fff; transform: scale(1.05); }
+
+        .calendar-stage { flex: 1; width: 100%; overflow-y: auto; padding: 20px; display: none; flex-direction: column; gap: 20px; scroll-behavior: smooth; }
+        .cal-grid-def { display: grid; grid-template-columns: 70px 1fr 1fr 1fr; gap: 15px; align-items: center; }
+        .cal-header-row { padding: 15px; position: sticky; top: 0; z-index: 10; background: var(--focus-banner); color: #fff; border-radius: 8px; font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .cal-col-center { text-align: center; justify-content: center; display: flex; }
+        .cal-col-left { text-align: left; justify-content: flex-start; }
+        .cal-month-title { display: none; }
+        .cal-month-block { margin-top: 30px; padding-top: 10px; border-top: 1px dashed var(--glass-border); }
+        .cal-row { padding: 10px 15px; background: var(--glass-bg); border-bottom: 1px solid var(--glass-border); transition: background 0.2s; }
+        .cal-row:hover { background: var(--indicator-hover-bg); }
+        .cal-day { font-weight: 800; font-size: 16px; color: var(--text-accent); }
+        .cal-cell { font-size: 12px; display: flex; flex-direction: column; gap: 4px; min-height: 24px; border-left: 1px solid var(--glass-border); padding-left: 10px; }
+        .cal-event { padding: 4px 8px; border-radius: 4px; background: rgba(255,255,255,0.3); cursor: pointer; border: 1px solid transparent; display: flex; justify-content: space-between; }
+        .cal-event:hover { border-color: var(--text-sub); background: var(--glass-highlight); }
+        .cal-year { opacity: 0.6; font-size: 10px; margin-left: 6px; }
+        .type-birth { color: var(--text-main); border-left: 3px solid var(--gen-green); }
+        .type-marr { color: var(--text-main); border-left: 3px solid var(--fav-gold); }
+        .type-death { color: var(--text-main); border-left: 3px solid var(--text-sub); }
+        .cal-row.is-today { background: rgba(199, 160, 73, 0.15); border: 2px solid var(--fav-gold); position: relative; z-index: 5; }
+        .cal-row.is-today .cal-day { color: var(--fav-gold); transform: scale(1.1); }
+    </style>
+</head>
+<body>
+
+    <div id="landingPage" class="landing-container">
+        
+        <nav style="padding: 20px; display:flex; justify-content: flex-end; align-items:center;">
+             <a href='/privacy' id='lnkPrivacyTop' style='margin-right:20px; text-decoration:none; color:var(--text-sub); font-size:12px; font-weight:600;'>ПОЛИТИКА КОНФИДЕНЦИАЛЬНОСТИ</a>
+             <button id="btnThemeLanding" onclick="toggleTheme()" style="background:none; border:none; font-size:20px; cursor:pointer;">☾</button>
+        </nav>
+
+        <div class="hero-section">
+            <h1 class="upload-title">GEDCOM<span style="color:var(--text-accent)">Explorer</span></h1>
+            <h2 id="txtSubtitle" class="upload-sub">Исследуйте своё прошлое. Загрузите GEDCOM файл.</h2>
+            
+            <p id="txtHeroDesc" style="max-width:600px; margin-bottom:30px; line-height:1.5; color:var(--text-sub);">
+                Простейший, бесплатный и безопасный способ просмотра вашего генеалогического древа онлайн. Регистрация не требуется. Ваши данные остаются приватными в вашем браузере.
+            </p>
+
+            <div>
+                <label class="btn-upload">
+                    <span id="txtBtnUpload">Открыть файл</span>
+                    <input type="file" id="fileInput" accept=".ged" style="display:none">
+                </label>
+                <button class="btn-demo" id="btnDemo" onclick="loadDemo()">Попробовать демо</button>
+            </div>
+
+            <p id="errorMsg" style="color:#ef4444; margin-top:20px; font-size:12px;"></p>
+
+            <div style="font-size:12px; opacity:0.6; margin-top:10px;">Версия 1.06</div>
+        </div>
+
+        <div class="seo-content">
+            <h2 id="txtSeoTitle">GEDCOM просмотрщик: Анализируйте своё генеалогическое древо безопасно</h2>
+            <p id="txtSeoDesc">GEDCOM Explorer — это бесплатный веб-инструмент, созданный для просмотра, анализа и обмена файлами истории семьи прямо в браузере без установки сложного ПО.</p>
+            
+            <div class="feature-grid">
+                <div class="feature-box">
+                    <span class="feature-icon">🔒</span>
+                    <div class="feature-title" id="txtFeat1Title">Гарантированная приватность</div>
+                    <p style="font-size:0.9rem;" id="txtFeat1Desc">Обработка происходит локально через JavaScript. Ваш файл никогда не отправляется на сервер.</p>
+                </div>
+                <div class="feature-box">
+                    <span class="feature-icon">🌳</span>
+                    <div class="feature-title" id="txtFeat2Title">Вид на 7 поколений</div>
+                    <p style="font-size:0.9rem;" id="txtFeat2Desc">Легко перемещайтесь между прошлыми и будущими поколениями с помощью интерактивного интерфейса.</p>
+                </div>
+                <div class="feature-box">
+                    <span class="feature-icon">📅</span>
+                    <div class="feature-title" id="txtFeat3Title">Календарь событий</div>
+                    <p style="font-size:0.9rem;" id="txtFeat3Desc">Откройте для себя рождения, браки и годовщины ваших предков месяц за месяцем.</p>
+                </div>
+            </div>
+
+            <article style="margin-top: 50px; border-top: 1px solid var(--glass-border); padding-top: 30px;">
+                <h3 style="color: var(--text-accent); margin-bottom: 20px;">Полное руководство по GEDCOM файлам</h3>
+                
+                <h4>1. Что такое GEDCOM файл?</h4>
+                <p>
+                    Аббревиатура <strong>GEDCOM</strong> расшифровывается как <em>GEnealogical Data COMmunication</em>. Это текстовый формат файла (обычно с расширением <code>.ged</code>), разработанный для обмена данными между различными генеалогическими программами.
+                    Думайте о нём как о "PDF" для генеалогии: он гарантирует, что ваше генеалогическое древо можно будет прочитать в любом ПО — Ancestry, MyHeritage, Family Tree Maker или Gramps.
+                </p>
+
+                <h4>2. Как экспортировать ваше генеалогическое древо</h4>
+                <p>Чтобы использовать этот просмотрщик, сначала нужно экспортировать ваши данные. Вот краткое руководство для основных платформ:</p>
+                <ul>
+                    <li><strong>Ancestry.com:</strong> Перейдите на вкладку "Древа", выберите ваше древо, нажмите "Настройки древа" и найдите кнопку "Экспорт древа" справа.</li>
+                    <li><strong>MyHeritage:</strong> Перейдите в "Генеалогическое древо" > "Управление древами". Нажмите "Экспорт в GEDCOM" рядом с древом, которое хотите загрузить.</li>
+                    <li><strong>FamilySearch:</strong> FamilySearch не позволяет напрямую экспортировать всю ветку одним нажатием. Вам потребуется стороннее ПО (например, RootsMagic или Ancestral Quest), чтобы синхронизироваться с FamilySearch и затем экспортировать GEDCOM файл оттуда.</li>
+                </ul>
+
+                <h4>3. Почему важна клиентская приватность</h4>
+                <p>
+                    Генеалогические данные часто содержат конфиденциальную информацию о живых родственниках (даты рождения, девичьи фамилии, места). Большинство онлайн-просмотрщиков требуют загрузить файл на их сервер.
+                    Это создаёт риск: если их сервер взломают, данные вашей семьи будут раскрыты.
+                </p>
+                <p>
+                    <strong>GEDCOM Explorer работает иначе.</strong> Мы используем технологию "Offline-First". Когда вы нажимаете "Открыть файл", ваш браузер считывает файл прямо с жёсткого диска вашего компьютера в свою временную память (ОЗУ).
+                    Данные <strong>никогда</strong> не передаются через интернет в наше облако. Они остаются на вашем устройстве. Как только вы закроете эту вкладку, данные мгновенно удаляются из памяти браузера.
+                </p>
+
+                <h4>4. Понимание структуры GEDCOM</h4>
+                <p>
+                    Стандартный GEDCOM файл имеет иерархическую структуру. Он состоит из записей, связанных уникальными идентификаторами.
+                    Самые распространённые записи — <strong>INDI</strong> (Индивид) и <strong>FAM</strong> (Семья).
+                    Запись INDI содержит имя человека, пол, события рождения (BIRT) и смерти (DEAT).
+                    Запись FAM связывает мужа (HUSB), жену (WIFE) и детей (CHIL).
+                    Наш просмотрщик анализирует эти текстовые строки и визуализирует их в интерактивную диаграмму, которую вы видите выше.
+                </p>
+            </article>
+
+            <h3 id="txtFaqTitle" style="margin-top: 40px; border-top: 1px solid var(--glass-border); padding-top: 30px;">Часто задаваемые вопросы (FAQ)</h3>
+            
+            <p><strong id="txtFaq1Q">Что такое .GED файл?</strong><br>
+            <span id="txtFaq1A">GEDCOM — это международный стандарт для обмена генеалогическими данными. Вы можете экспортировать его из Ancestry, MyHeritage или FamilySearch.</span></p>
+            
+            <p><strong id="txtFaq2Q">Сервис бесплатный?</strong><br>
+            <span id="txtFaq2A">Да, GEDCOM Explorer полностью бесплатен.</span></p>
+
+            <p><strong id="txtFaq3Q">Могу ли я редактировать моё древо здесь?</strong><br>
+            <span style="color:var(--text-sub)">В настоящее время это просмотрщик только для чтения. Он предназначен для консультации, анализа и отображения древа, но не для редактирования данных или добавления новых людей. Для редактирования мы рекомендуем использовать ПО, в котором вы создали исходный файл.</span></p>
+        </div>
+
+        <footer class="footer-legal">
+            <p>© 2026 GEDCOM Explorer. <span id="txtRights">Все права защищены.</span></p>
+            <p style="margin-top:15px;">
+                <a href='/privacy'>Политика конфиденциальности</a> &bull; 
+                <a href='/privacy'>Условия использования</a> &bull; 
+                <a href='/privacy'>Политика использования cookie</a>
+            </p>
+        </footer>
+    </div>
+    
+    <div id="appInterface">
+        <div class="top-bar">
+            <div class="mode-area">
+                <button id="btnCalendar" title="Вид календаря">📅</button>
+            </div>
+
+            <div class="nav-left">
+                <button class="nav-btn" id="btnBack" title="Назад" disabled>‹</button>
+                <button class="nav-btn" id="btnHome" title="В начало">⌂</button>
+                <div class="stats-badge" id="statsBadge"><span id="txtStats">Людей:</span> <strong>0</strong></div>
+                <button class="nav-btn" id="btnToday" title="Перейти к сегодня" style="display:none; font-size: 12px; font-weight: 700; width: auto; padding: 0 12px;">СЕГОДНЯ</button>
+                <div id="dynamicMonthTitle" class="header-month-title">ЯНВАРЬ</div>
+            </div>
+
+            <div class="center-nav-container">
+                <div class="search-wrapper" id="searchWrapper">
+                    <input type="text" class="search-input" id="searchInput" placeholder="Поиск человека...">
+                    <div style="position:relative;">
+                        <button class="nav-btn" id="btnFav" title="Избранное">★</button>
+                        <div class="fav-dropdown" id="favDropdown">
+                            <div class="fav-header" id="txtFavHeader">Сохранённые избранные</div>
+                            <div class="fav-list" id="favList"></div>
+                            <div class="fav-footer" id="favFooter" style="display:none;">
+                                <button class="btn-clear-favs" id="btnFavClear" onclick="clearAllFavorites()">Очистить всё</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="search-results" id="searchResults"></div>
+                </div>
+                
+                <div class="month-nav-wrapper" id="monthNavWrapper">
+                    </div>
+            </div>
+
+            <div class="nav-right">
+                <div class="app-logo">GEDCOM<span id="appTitleSuffix">Explorer</span></div>
+                <button class="nav-btn" id="btnTheme" title="Сменить тему">☾</button>
+            </div>
+        </div>
+
+        <div class="navigator-stage" id="stageContainer">
+            <div class="columns-wrapper" id="stage"></div>
+        </div>
+
+        <div class="calendar-stage" id="calendarStage">
+            <div class="cal-header-row cal-grid-def">
+                <div class="cal-col-center" id="calHeadDay">День</div>
+                <div class="cal-col-left" id="calHeadBirth">Рождения</div>
+                <div class="cal-col-left" id="calHeadMarr">Браки</div>
+                <div class="cal-col-left" id="calHeadDeath">Смерти</div>
+            </div>
+            <div id="calendarContent"></div>
+        </div>
+
+        <div class="timeline-container" id="timelineUI" style="display:none;">
+            <div class="timeline-year-start" id="tlStart">1900</div>
+            <div class="timeline-track-wrapper" id="tlTrack"><div class="timeline-line"></div></div>
+            <div class="timeline-year-end" id="tlEnd">2024</div>
+        </div>
+    </div>
+
+<script>
+    // --- ДЕМО ДАННЫЕ ДЛЯ ПРОВЕРКИ ---
+    const DEMO_GEDCOM = `0 HEAD
+1 SOUR GEDCOMExplorer
+1 GEDC
+2 VERS 5.5.1
+2 FORM LINEAGE-LINKED
+1 CHAR UTF-8
+0 @I1@ INDI
+1 NAME Joseph /Kennedy/
+1 SEX M
+1 BIRT
+2 DATE 6 SEP 1888
+2 PLAC Boston, MA, USA
+1 DEAT
+2 DATE 18 NOV 1969
+2 PLAC Hyannis Port, MA, USA
+1 FAMS @F1@
+0 @I2@ INDI
+1 NAME Rose /Fitzgerald/
+1 SEX F
+1 BIRT
+2 DATE 22 JUL 1890
+2 PLAC Boston, MA, USA
+1 DEAT
+2 DATE 22 JAN 1995
+2 PLAC Hyannis Port, MA, USA
+1 FAMS @F1@
+0 @I3@ INDI
+1 NAME John Fitzgerald /Kennedy/
+1 SEX M
+1 BIRT
+2 DATE 29 MAY 1917
+2 PLAC Brookline, MA, USA
+1 DEAT
+2 DATE 22 NOV 1963
+2 PLAC Dallas, TX, USA
+1 FAMC @F1@
+1 FAMS @F2@
+0 @I4@ INDI
+1 NAME Jacqueline /Bouvier/
+1 SEX F
+1 BIRT
+2 DATE 28 JUL 1929
+2 PLAC Southampton, NY, USA
+1 DEAT
+2 DATE 19 MAY 1994
+2 PLAC New York, NY, USA
+1 FAMS @F2@
+0 @I5@ INDI
+1 NAME Robert Francis /Kennedy/
+1 SEX M
+1 BIRT
+2 DATE 20 NOV 1925
+1 DEAT
+2 DATE 6 JUN 1968
+1 FAMC @F1@
+0 @F1@ FAM
+1 HUSB @I1@
+1 WIFE @I2@
+1 CHIL @I3@
+1 CHIL @I5@
+1 MARR
+2 DATE 7 OCT 1914
+2 PLAC Boston, MA, USA
+0 @F2@ FAM
+1 HUSB @I3@
+1 WIFE @I4@
+1 MARR
+2 DATE 12 SEP 1953
+2 PLAC Newport, RI, USA
+0 TRLR`;
+
+    // --- ПЕРЕВОД НА РУССКИЙ ЯЗЫК ---
+    const TRANSLATIONS = {
+        ru: {
+            subtitle: "Исследуйте своё прошлое. Загрузите GEDCOM файл.",
+            heroDesc: "Простейший, бесплатный и безопасный способ просмотра вашего генеалогического древа онлайн. Регистрация не требуется. Ваши данные остаются приватными в вашем браузере.",
+            btnUpload: "Открыть файл",
+            btnDemo: "Попробовать демо",
+            stats: "Людей:",
+            search: "Поиск человека...",
+            favHeader: "Сохранённые избранные",
+            favEmpty: "Нет сохранённых избранных",
+            favClear: "Очистить всё",
+            today: "СЕГОДНЯ",
+            
+            // SEO
+            seoTitle: "Как работает GEDCOM Explorer?",
+            seoDesc: "GEDCOM Explorer — это бесплатный веб-инструмент, созданный для просмотра и анализа файлов истории семьи прямо в браузере.",
+            feat1Title: "Гарантированная приватность",
+            feat1Desc: "Обработка происходит локально через JavaScript. Ваш файл никогда не отправляется на сервер.",
+            feat2Title: "Вид на 7 поколений",
+            feat2Desc: "Легко перемещайтесь между прошлыми и будущими поколениями с помощью интерактивного интерфейса.",
+            feat3Title: "Календарь событий",
+            feat3Desc: "Откройте для себя рождения, браки и годовщины ваших предков месяц за месяцем.",
+            faqTitle: "Часто задаваемые вопросы (FAQ)",
+            faq1Q: "Что такое .GED файл?",
+            faq1A: "GEDCOM — это международный стандарт для обмена генеалогическими данными. Вы можете экспортировать его из Ancestry, MyHeritage или FamilySearch.",
+            faq2Q: "Сервис бесплатный?",
+            faq2A: "Да, GEDCOM Explorer полностью бесплатен.",
+            legal: { privacy: "Политика конфиденциальности", terms: "Условия использования", cookie: "Политика использования cookie", rights: "Все права защищены." },
+
+            monthNames: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
+            shortMonths: ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"],
+            calHeaders: ["День", "Рождения", "Браки", "Смерти"],
+            cols: { ggp: "Прабабушки/прадедушки", gp: "Бабушки/дедушки", p: "Родители", c: "Дети", gc: "Внуки", ggc: "Правнуки", sib: "Братья и сёстры" },
+            card: { birt: "Рождение", deat: "Смерть", marr: "Брак", spouses: "Супруги", noSpouse: "Нет зарегистрированных супругов" },
+            tooltips: { back: "Назад", home: "В начало", calendar: "Вид календаря", tree: "Вернуться к древу", fav: "Избранное", theme: "Сменить тему", today: "Перейти к сегодня", fs: "Посмотреть на FamilySearch", calendarView: "Посмотреть в календаре", profileView: "Перейти к профилю" },
+            dateMap: { "JAN":"января", "FEB":"февраля", "MAR":"марта", "APR":"апреля", "MAY":"мая", "JUN":"июня", "JUL":"июля", "AUG":"августа", "SEP":"сентября", "OCT":"октября", "NOV":"ноября", "DEC":"декабря", "ABT":"около", "BEF":"до", "AFT":"после" },
+            
+            msg: { noneFound: "Не найдено", noEvents: "Нет событий для отображения", at: "в", loadErr: "Ошибка загрузки. Убедитесь, что это корректный GEDCOM файл (.ged).", readErr: "Ошибка чтения файла." }
+        }
+    };
+
+    let currentLang = 'ru';
+
+    function t(key) {
+        const keys = key.split('.');
+        let val = TRANSLATIONS.ru;
+        for(let k of keys) {
+            val = val ? val[k] : null;
+        }
+        return val || key;
+    }
+
+    function updateStaticUI() {
+        // App UI updates
+        document.getElementById('txtSubtitle').innerText = t('subtitle');
+        document.getElementById('txtBtnUpload').innerText = t('btnUpload');
+
+        const btnDemo = document.getElementById('btnDemo');
+        if(btnDemo) btnDemo.innerText = t('btnDemo');
+        
+        document.getElementById('txtStats').innerText = t('stats');
+        document.getElementById('btnToday').innerText = t('today');
+        
+        // Tooltips updates
+        document.getElementById('btnBack').title = t('tooltips.back');
+        document.getElementById('btnHome').title = t('tooltips.home');
+        document.getElementById('btnFav').title = t('tooltips.fav');
+        document.getElementById('btnTheme').title = t('tooltips.theme');
+        document.getElementById('btnToday').title = t('tooltips.today');
+        
+        // Landing Page Translation Updates
+        const setTxt = (id, key) => { 
+            const el = document.getElementById(id); 
+            if(el) el.innerText = t(key); 
+        };
+
+        setTxt('txtHeroDesc', 'heroDesc');
+        setTxt('txtSeoTitle', 'seoTitle');
+        setTxt('txtSeoDesc', 'seoDesc');
+        
+        setTxt('txtFeat1Title', 'feat1Title');
+        setTxt('txtFeat1Desc', 'feat1Desc');
+        setTxt('txtFeat2Title', 'feat2Title');
+        setTxt('txtFeat2Desc', 'feat2Desc');
+        setTxt('txtFeat3Title', 'feat3Title');
+        setTxt('txtFeat3Desc', 'feat3Desc');
+        
+        setTxt('txtFaqTitle', 'faqTitle');
+        setTxt('txtFaq1Q', 'faq1Q');
+        setTxt('txtFaq1A', 'faq1A');
+        setTxt('txtFaq2Q', 'faq2Q');
+        setTxt('txtFaq2A', 'faq2A');
+
+        setTxt('txtRights', 'legal.rights');
+
+        document.getElementById('txtFavHeader').innerText = t('favHeader');
+        const btnFavClear = document.getElementById('btnFavClear');
+        if(btnFavClear) btnFavClear.innerText = t('favClear');
+
+        const btnCalendar = document.getElementById('btnCalendar');
+        if(IS_CALENDAR_MODE) {
+            btnCalendar.title = t('tooltips.tree');
+        } else {
+            btnCalendar.title = t('tooltips.calendar');
+        }
+
+        const wrapper = document.getElementById('monthNavWrapper');
+        if(wrapper) {
+            wrapper.innerHTML = '';
+            TRANSLATIONS.ru.shortMonths.forEach((m, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'month-btn';
+                btn.onclick = () => scrollToMonth(i);
+                btn.innerText = m;
+                wrapper.appendChild(btn);
+            });
+        }
+    }
+
+    function updateCalendarHeaders() {
+        document.getElementById('calHeadDay').innerText = t('calHeaders.0');
+        document.getElementById('calHeadBirth').innerText = t('calHeaders.1');
+        document.getElementById('calHeadMarr').innerText = t('calHeaders.2');
+        document.getElementById('calHeadDeath').innerText = t('calHeaders.3');
+    }
+
+    let DATA = { inds: {}, fams: {} };
+    let HISTORY_STACK = [];
+    let CURRENT_ID = null;
+    let INITIAL_ID = null;
+    let IS_NAVIGATING_BACK = false;
+    let FAVORITES = new Set();
+    const AVATAR_ICONS = {
+        M: `<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M12 14c-4.42 0-8 1.79-8 4v2h16v-2c0-2.21-3.58-4-8-4z"/></svg>`,
+        F: `<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M12 14c-4.42 0-8 1.79-8 4v2h16v-2c0-2.21-3.58-4-8-4z"/></svg>`,
+        U: `<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 16c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>`
+    };
+    let calendarObserver = null; 
+
+    function getAvatarSVG(sex) {
+        if(sex === 'M') return AVATAR_ICONS.M;
+        if(sex === 'F') return AVATAR_ICONS.F;
+        return AVATAR_ICONS.U;
+    }
+
+    function loadFavorites() {
+        const stored = localStorage.getItem('genealogy_favs');
+        if(stored) {
+            try {
+                const arr = JSON.parse(stored);
+                FAVORITES = new Set(arr);
+            } catch(e) { console.error("Error loading favs", e); }
+        }
+    }
+
+    function saveFavorites() {
+        localStorage.setItem('genealogy_favs', JSON.stringify([...FAVORITES]));
+    }
+
+    function toggleFavorite(id) {
+        if(FAVORITES.has(id)) { FAVORITES.delete(id); } else { FAVORITES.add(id); }
+        saveFavorites(); updateProfileStar(id); renderFavoritesList(); 
+    }
+
+    function updateProfileStar(id) {
+        const btn = document.getElementById('profileFavBtn');
+        if(!btn) return;
+        if(id === CURRENT_ID) {
+            if(FAVORITES.has(id)) { btn.classList.add('active'); btn.innerText = '★'; } else { btn.classList.remove('active'); btn.innerText = '☆'; }
+        }
+    }
+
+    function clearAllFavorites() {
+        if(confirm("Вы уверены, что хотите удалить все избранные записи?")) {
+            FAVORITES.clear(); saveFavorites(); renderFavoritesList(); if(CURRENT_ID) updateProfileStar(CURRENT_ID); 
+        }
+    }
+
+    const btnFav = document.getElementById('btnFav');
+    const favDropdown = document.getElementById('favDropdown');
+    if(btnFav) {
+        btnFav.onclick = () => { favDropdown.classList.toggle('show'); renderFavoritesList(); };
+    }
+    document.addEventListener('click', function(event) {
+        if(btnFav && favDropdown && !btnFav.contains(event.target) && !favDropdown.contains(event.target)) { favDropdown.classList.remove('show'); }
+    });
+
+    function renderFavoritesList() {
+        const listContainer = document.getElementById('favList');
+        const footerContainer = document.getElementById('favFooter');
+        if(!listContainer) return;
+        listContainer.innerHTML = '';
+        if(FAVORITES.size === 0) {
+            listContainer.innerHTML = `<div class="fav-empty">${t('favEmpty')}</div>`; 
+            if(footerContainer) footerContainer.style.display = 'none'; 
+            return;
+        }
+        FAVORITES.forEach(id => {
+            const p = DATA.inds[id];
+            if(p) {
+                const div = document.createElement('div');
+                div.className = 'fav-item';
+                div.innerHTML = `<span>${toTitleCase(p.name)}</span><span class="remove-fav" onclick="event.stopPropagation(); toggleFavorite('${id}')">×</span>`;
+                div.onclick = () => { render7GenView(id); if(favDropdown) favDropdown.classList.remove('show'); };
+                listContainer.appendChild(div);
+            }
+        });
+        if(footerContainer) footerContainer.style.display = 'flex'; 
+    }
+
+    const btnTheme = document.getElementById('btnTheme');
+    function toggleTheme() {
+        const html = document.documentElement;
+        if (html.getAttribute('data-theme') === 'dark') {
+            html.setAttribute('data-theme', 'light');
+            if(btnTheme) btnTheme.innerText = '☾';
+            const btnLanding = document.getElementById('btnThemeLanding');
+            if(btnLanding) btnLanding.innerText = '☾';
+        } else {
+            html.setAttribute('data-theme', 'dark');
+            if(btnTheme) btnTheme.innerText = '☀';
+            const btnLanding = document.getElementById('btnThemeLanding');
+            if(btnLanding) btnLanding.innerText = '☀';
+        }
+    }
+    if(btnTheme) btnTheme.onclick = toggleTheme;
+    const btnThemeLanding = document.getElementById('btnThemeLanding');
+    if(btnThemeLanding) btnThemeLanding.onclick = toggleTheme;
+
+    function parseGEDCOM(text) {
+        const lines = text.split(/\r?\n/);
+        const inds = {}; const fams = {};
+        let cid = null, ctype = null, ctag = null;
+        const regex = /^\s*(\d+)\s+(@\w+@|\w+)(\s+(.*))?$/;
+        lines.forEach(line => {
+            const m = line.match(regex);
+            if (!m) return;
+            const lvl = m[1], tag = m[2], val = m[4] || "";
+            if (lvl === '0') {
+                if (val.trim() === 'INDI') {
+                    cid = tag.replace(/@/g, ''); ctype = 'INDI';
+                    inds[cid] = { id: cid, name: 'Неизвестно', given: '', surname: '', sex: 'U', birth: {}, death: {}, fams: [], famc: null, notes: [], parents: [], fsId: null };
+                } else if (val.trim() === 'FAM') {
+                    cid = tag.replace(/@/g, ''); ctype = 'FAM';
+                    fams[cid] = { id: cid, husb: null, wife: null, children: [], marr: { date: null, place: null } };
+                } else cid = null;
+                ctag = null; return;
+            }
+            if (!cid) return;
+            if (lvl === '1') {
+                if (ctype === 'INDI') {
+                    if (tag === 'NAME') {
+                        inds[cid].name = val.replace(/\//g, '');
+                        const parts = val.split('/');
+                        if (parts.length > 1) { inds[cid].given = parts[0].trim(); inds[cid].surname = parts[1].trim(); } else { inds[cid].given = inds[cid].name; inds[cid].surname = ''; }
+                    }
+                    if (tag === 'SEX') inds[cid].sex = val;
+                    if (tag === 'FAMS') inds[cid].fams.push(val.replace(/@/g, ''));
+                    if (tag === 'FAMC') inds[cid].famc = val.replace(/@/g, '');
+                    if (tag === '_FSFTID') inds[cid].fsId = val; 
+                    if (['BIRT','DEAT','NOTE'].includes(tag)) ctag = tag;
+                    if (tag === 'NOTE' && val) inds[cid].notes.push(val);
+                }
+                if (ctype === 'FAM') {
+                    const v = val.replace(/@/g, '');
+                    if (tag === 'HUSB') fams[cid].husb = v;
+                    if (tag === 'WIFE') fams[cid].wife = v;
+                    if (tag === 'CHIL') fams[cid].children.push(v);
+                    if (tag === 'MARR') ctag = 'MARR';
+                }
+            }
+            if (lvl === '2') {
+                if (ctype === 'INDI' && ctag) {
+                    const target = ctag === 'BIRT' ? inds[cid].birth : (ctag === 'DEAT' ? inds[cid].death : null);
+                    if (target) { if (tag === 'DATE') target.date = val; if (tag === 'PLAC') target.place = val; }
+                    if (ctag === 'NOTE' && ['CONT','CONC'].includes(tag)) inds[cid].notes.push((tag==='CONT'?'\n':'') + val);
+                }
+                if (ctype === 'FAM' && ctag === 'MARR') {
+                    if (tag === 'DATE') fams[cid].marr.date = val;
+                    if (tag === 'PLAC') fams[cid].marr.place = val;
+                }
+            }
+        });
+        Object.values(inds).forEach(p => {
+            if (p.famc && fams[p.famc]) {
+                const f = fams[p.famc];
+                if (f.husb && inds[f.husb]) p.parents.push(inds[f.husb]);
+                if (f.wife && inds[f.wife]) p.parents.push(inds[f.wife]);
+            }
+        });
+        return { inds, fams };
+    }
+
+    function formatDateLocalized(dateStr) {
+        if (!dateStr) return null;
+        const map = TRANSLATIONS.ru.dateMap;
+        return dateStr.toUpperCase().replace(/[A-Z]{3}/g, (match) => map[match] || match);
+    }
+    function formatPlace(placeStr) {
+        if (!placeStr) return '<span class="vital-place-sub">-</span>';
+        const parts = placeStr.split(',');
+        const main = parts.shift().trim(); 
+        const rest = parts.map(s => s.trim()).join('<br>');
+        let html = `<span class="vital-place-main">${main}</span>`;
+        if(rest) html += `<span class="vital-place-sub">${rest}</span>`;
+        return html;
+    }
+    function getYear(d) { return (d && d.match(/\d{4}/)) ? d.match(/\d{4}/)[0] : ""; }
+    function toTitleCase(str) {
+        if(!str) return "";
+        return str;
+    }
+    function getNextGen(peopleList) {
+        let nextGen = [];
+        peopleList.forEach(p => {
+            p.fams.forEach(fid => {
+                const f = DATA.fams[fid];
+                if (f && f.children) { f.children.forEach(cid => { if (DATA.inds[cid]) nextGen.push(DATA.inds[cid]); }); }
+            });
+        });
+        const unique = [...new Map(nextGen.map(item => [item.id, item])).values()];
+        return unique.sort((a,b) => (parseInt(getYear(a.birth.date))||9999) - (parseInt(getYear(b.birth.date))||9999));
+    }
+    function getPrevGen(peopleList) {
+        let prevGen = [];
+        peopleList.forEach(p => { if (p.parents) prevGen.push(...p.parents); });
+        return [...new Map(prevGen.map(item => [item.id, item])).values()];
+    }
+    function hasChildren(p) {
+        for(let fid of p.fams) { if(DATA.fams[fid] && DATA.fams[fid].children && DATA.fams[fid].children.length > 0) return true; }
+        return false;
+    }
+    function getSiblings(person) {
+        if (!person.famc) return [];
+        const f = DATA.fams[person.famc];
+        if (!f || !f.children) return [];
+        let siblings = [];
+        f.children.forEach(cid => { if(cid !== person.id && DATA.inds[cid]) siblings.push(DATA.inds[cid]); });
+        return siblings.sort((a,b) => (parseInt(getYear(a.birth.date))||9999) - (parseInt(getYear(b.birth.date))||9999));
+    }
+    function toggleDotHighlight(id, active) {
+        if(!id) return;
+        const dot = document.getElementById('tldot-' + id);
+        if(dot) { if(active) dot.classList.add('active-hover'); else dot.classList.remove('active-hover'); }
+    }
+    function parseGedDateDayMonth(dateStr) {
+        if (!dateStr) return null;
+        const parts = dateStr.split(' ');
+        let day = null, monthStr = null, year = '';
+        parts.forEach(p => {
+            if (!day && /^\d{1,2}$/.test(p)) day = parseInt(p);
+            else if (!monthStr && /^[A-Za-z]{3}$/.test(p)) monthStr = p.toUpperCase();
+            else if (/^\d{4}$/.test(p)) year = p;
+        });
+        if (day && monthStr) {
+            const monthsEng = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+            const monthsRus = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+            let mIndex = monthsEng.indexOf(monthStr);
+            if (mIndex < 0) mIndex = monthsRus.indexOf(monthStr);
+            if (mIndex >= 0) return { d: day, m: mIndex, y: year };
+        }
+        return null; 
+    }
+
+    function navigateToCalendarDate(dateStr) {
+        if(!dateStr) return;
+        dateStr = dateStr.replace(/\\'/g, "'");
+        const dateObj = parseGedDateDayMonth(dateStr); 
+        if(!dateObj) return; 
+        IS_CALENDAR_MODE = true;
+        document.getElementById('btnBack').style.display = 'none';
+        document.getElementById('btnHome').style.display = 'none';
+        document.getElementById('statsBadge').style.display = 'none'; 
+        document.getElementById('btnToday').style.display = 'block'; 
+        const searchWrapper = document.getElementById('searchWrapper');
+        const monthNavWrapper = document.getElementById('monthNavWrapper');
+        if(searchWrapper) searchWrapper.style.display = 'none';
+        if(monthNavWrapper) monthNavWrapper.style.display = 'flex';
+        const dynTitle = document.getElementById('dynamicMonthTitle');
+        if(dynTitle) dynTitle.style.display = 'block';
+        const titleSuffix = document.getElementById('appTitleSuffix');
+        if(titleSuffix) {
+            titleSuffix.innerText = 'Calendar';
+            titleSuffix.style.color = 'var(--fav-gold)';
+        }
+        const btnCalendar = document.getElementById('btnCalendar');
+        if(btnCalendar) {
+            btnCalendar.innerText = '🌳';
+            btnCalendar.title = t('tooltips.tree'); 
+        }
+        document.getElementById('stageContainer').style.display = 'none';
+        document.getElementById('timelineUI').style.display = 'none';
+        document.getElementById('calendarStage').style.display = 'flex';
+        renderCalendar();
+        setupCalendarObserver();
+        setTimeout(() => {
+            const targetId = `cal-row-${dateObj.m}-${dateObj.d}`;
+            const targetEl = document.getElementById(targetId);
+            if(targetEl) {
+                targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                targetEl.classList.add('flash-highlight');
+                setTimeout(() => { targetEl.classList.remove('flash-highlight'); }, 2000);
+            } else { scrollToMonth(dateObj.m); }
+        }, 100);
+    }
+
+    function renderTimeline(allVisiblePeople, currentFocusId) {
+        const track = document.getElementById('tlTrack');
+        if(!track) return;
+        track.innerHTML = '<div class="timeline-line"></div>';
+        const validPeople = allVisiblePeople.filter(p => {
+            const y = parseInt(getYear(p.birth.date));
+            return !isNaN(y);
+        }).map(p => ({...p, year: parseInt(getYear(p.birth.date))}));
+        if (validPeople.length === 0) { document.getElementById('timelineUI').style.display = 'none'; return; }
+        document.getElementById('timelineUI').style.display = 'flex';
+        const years = validPeople.map(p => p.year);
+        let minYear = Math.min(...years);
+        let maxYear = Math.max(...years);
+        minYear = Math.floor(minYear / 10) * 10 - 10;
+        maxYear = Math.ceil(maxYear / 10) * 10 + 10;
+        document.getElementById('tlStart').innerText = minYear;
+        document.getElementById('tlEnd').innerText = maxYear;
+        const range = maxYear - minYear;
+        let startCentury = Math.ceil(minYear / 100) * 100;
+        if(startCentury === minYear) startCentury += 100;
+        for (let c = startCentury; c < maxYear; c += 100) {
+            const percent = ((c - minYear) / range) * 100;
+            const line = document.createElement('div');
+            line.className = 'timeline-century'; line.style.left = `${percent}%`;
+            const label = document.createElement('div');
+            label.className = 'timeline-century-label'; label.innerText = c; label.style.left = `${percent}%`;
+            track.appendChild(line); track.appendChild(label);
+        }
+        validPeople.forEach(p => {
+            const dot = document.createElement('div');
+            dot.className = 'timeline-dot'; dot.id = 'tldot-' + p.id;
+            if (p.id === currentFocusId) dot.classList.add('is-focus');
+            const percent = ((p.year - minYear) / range) * 100;
+            dot.style.left = `${percent}%`;
+            if(p.sex === 'M') dot.style.backgroundColor = 'var(--accent-m-text)';
+            else if(p.sex === 'F') dot.style.backgroundColor = 'var(--accent-f-text)';
+            else dot.style.backgroundColor = 'var(--text-sub)';
+            dot.innerHTML = `<div class="timeline-label">${toTitleCase(p.name)} (${p.year})</div>`;
+            dot.onclick = () => render7GenView(p.id);
+            track.appendChild(dot);
+        });
+    }
+
+    function render7GenView(focusId) {
+        if (!IS_NAVIGATING_BACK && CURRENT_ID && CURRENT_ID !== focusId) { HISTORY_STACK.push(CURRENT_ID); }
+        CURRENT_ID = focusId; IS_NAVIGATING_BACK = false; 
+        document.getElementById('btnBack').disabled = HISTORY_STACK.length === 0;
+        const stage = document.getElementById('stage');
+        const container = document.getElementById('stageContainer');
+        if(!stage) return;
+        stage.style.opacity = 0;
+        setTimeout(() => {
+            stage.innerHTML = '';
+            const focus = DATA.inds[focusId];
+            if (!focus) return;
+            const gen0 = [focus];
+            const genM1 = getPrevGen(gen0); const genM2 = getPrevGen(genM1); const genM3 = getPrevGen(genM2);
+            const genP1 = getNextGen(gen0); const genP2 = getNextGen(genP1); const genP3 = getNextGen(genP2);
+            const siblings = getSiblings(focus); 
+            const allPeople = [...genM3, ...genM2, ...genM1, ...gen0, ...siblings, ...genP1, ...genP2, ...genP3];
+            renderTimeline(allPeople, focus.id);
+            stage.appendChild(createColumn(genM3, t('cols.ggp'), "w-3 g-minus-3"));
+            stage.appendChild(createColumn(genM2, t('cols.gp'), "w-2 g-minus-2"));
+            const parentsCol = document.createElement('div'); parentsCol.className = "column w-1 g-minus-1 parents-col-fix";
+            const fixedArea = document.createElement('div'); fixedArea.className = "parents-fixed-area";
+            const pHead = document.createElement('div'); pHead.className = 'col-header'; pHead.innerHTML = `${t('cols.p')} <span class="col-count">(${genM1.length})</span>`;
+            fixedArea.appendChild(pHead);
+            if(genM1.length === 0) { fixedArea.innerHTML += `<div style="text-align:center; opacity:0.2; font-size:20px; margin: 10px 0;">•</div>`; } else {
+                genM1.forEach(p => {
+                    const card = document.createElement('div');
+                    const hasP = p.parents && p.parents.length > 0; const hasC = hasChildren(p);
+                    card.className = `card`;
+                    card.onmouseenter = () => toggleDotHighlight(p.id, true); card.onmouseleave = () => toggleDotHighlight(p.id, false);
+                    const leftIndicator = hasP ? '<div class="indicator-box indicator-active left">‹</div>' : '<div class="indicator-box"></div>';
+                    const rightIndicator = hasC ? '<div class="indicator-box indicator-active right">›</div>' : '<div class="indicator-box"></div>';
+                    const bYear = getYear(p.birth.date); const dYear = getYear(p.death.date); const lifeSpan = dYear ? `${bYear} - ${dYear}` : bYear;
+                    card.innerHTML = `${leftIndicator}<div class="card-content"><div class="mini-avatar ${getAvatarClass(p.sex)}">${getAvatarSVG(p.sex)}</div><div class="mini-info"><span class="mini-name">${toTitleCase(p.name)}</span><span class="mini-date">${lifeSpan}</span></div></div>${rightIndicator}`;
+                    card.onclick = () => render7GenView(p.id);
+                    fixedArea.appendChild(card);
+                });
+            }
+            parentsCol.appendChild(fixedArea);
+            const scrollArea = document.createElement('div'); scrollArea.className = "parents-scroll-area g-siblings";
+            const subHeader = document.createElement('div'); subHeader.className = 'sub-col-header'; 
+            if(siblings.length > 0) subHeader.innerHTML = `${t('cols.sib')} <span class="col-count">(${siblings.length})</span>`; else subHeader.innerHTML = t('cols.sib');
+            scrollArea.appendChild(subHeader);
+            if(siblings.length > 0) {
+                siblings.forEach(sib => {
+                    const sCard = document.createElement('div');
+                    const hasP = sib.parents && sib.parents.length > 0; const hasC = hasChildren(sib);
+                    sCard.className = `card`; sCard.onmouseenter = () => toggleDotHighlight(sib.id, true); sCard.onmouseleave = () => toggleDotHighlight(sib.id, false);
+                    const leftIndicator = hasP ? '<div class="indicator-box indicator-active left">‹</div>' : '<div class="indicator-box"></div>';
+                    const rightIndicator = hasC ? '<div class="indicator-box indicator-active right">›</div>' : '<div class="indicator-box"></div>';
+                    const bYear = getYear(sib.birth.date); const dYear = getYear(sib.death.date); const lifeSpan = dYear ? `${bYear} - ${dYear}` : bYear;
+                    sCard.innerHTML = `${leftIndicator}<div class="card-content"><div class="mini-avatar ${getAvatarClass(sib.sex)}">${getAvatarSVG(sib.sex)}</div><div class="mini-info"><span class="mini-name">${toTitleCase(sib.name)}</span><span class="mini-date">${lifeSpan}</span></div></div>${rightIndicator}`;
+                    sCard.onclick = () => render7GenView(sib.id);
+                    scrollArea.appendChild(sCard);
+                });
+            } else { scrollArea.innerHTML += `<div style="text-align:center; opacity:0.3; font-size:11px; margin-top:5px;">${t('msg.noneFound')}</div>`; }
+            parentsCol.appendChild(scrollArea); stage.appendChild(parentsCol);
+            stage.appendChild(createFocusCard(focus));
+            stage.appendChild(createColumn(genP1, t('cols.c'), "w-1 g-plus-1"));
+            stage.appendChild(createColumn(genP2, t('cols.gc'), "w-2 g-plus-2"));
+            stage.appendChild(createColumn(genP3, t('cols.ggc'), "w-3 g-plus-3"));
+            stage.style.opacity = 1;
+            setTimeout(() => {
+                const focusEl = stage.querySelector('.w-0');
+                if(focusEl && container) {
+                    const centerPos = focusEl.offsetLeft - (container.clientWidth / 2) + (focusEl.clientWidth / 2);
+                    container.scrollTo({ left: centerPos, behavior: 'smooth' });
+                }
+            }, 100);
+        }, 200);
+    }
+
+    function getAvatarClass(sex) {
+        if(sex === 'M') return 'avatar-m'; if(sex === 'F') return 'avatar-f'; return 'avatar-u';
+    }
+
+    function createColumn(list, title, classes) {
+        const col = document.createElement('div'); col.className = `column ${classes}`;
+        const head = document.createElement('div'); head.className = 'col-header'; head.innerHTML = `${title} <span class="col-count">(${list.length})</span>`; col.appendChild(head);
+        if(list.length === 0) { col.innerHTML += `<div style="text-align:center; opacity:0.2; font-size:20px; margin-top:20px;">•</div>`; return col; }
+        list.forEach(p => {
+            const card = document.createElement('div');
+            const hasP = p.parents && p.parents.length > 0; const hasC = hasChildren(p);
+            card.className = `card`; card.onmouseenter = () => toggleDotHighlight(p.id, true); card.onmouseleave = () => toggleDotHighlight(p.id, false);
+            const leftIndicator = hasP ? '<div class="indicator-box indicator-active left">‹</div>' : '<div class="indicator-box"></div>';
+            const rightIndicator = hasC ? '<div class="indicator-box indicator-active right">›</div>' : '<div class="indicator-box"></div>';
+            const bYear = getYear(p.birth.date); const dYear = getYear(p.death.date); const lifeSpan = dYear ? `${bYear} - ${dYear}` : bYear;
+            card.innerHTML = `${leftIndicator}<div class="card-content"><div class="mini-avatar ${getAvatarClass(p.sex)}">${getAvatarSVG(p.sex)}</div><div class="mini-info"><span class="mini-name">${toTitleCase(p.name)}</span><span class="mini-date">${lifeSpan}</span></div></div>${rightIndicator}`;
+            card.onclick = () => render7GenView(p.id); col.appendChild(card);
+        });
+        return col;
+    }
+
+    function createFocusCard(p) {
+        const col = document.createElement('div'); col.className = `column w-0`;
+        const card = document.createElement('div'); card.className = 'focus-card';
+        const notes = p.notes.join("\n").trim();
+        let spouseList = [];
+        p.fams.forEach(fid => {
+            const f = DATA.fams[fid];
+            if(f) {
+                const sId = (f.husb === p.id) ? f.wife : f.husb;
+                if(sId && DATA.inds[sId]) {
+                    const spouse = DATA.inds[sId]; const mDate = formatDateLocalized(f.marr.date); const mPlace = f.marr.place;
+                    let metaParts = []; if(mDate) metaParts.push(mDate); if(mPlace) metaParts.push(`${t('msg.at')} ${mPlace}`);
+                    const metaStr = metaParts.length > 0 ? `${t('card.marr')}: ${metaParts.join(' ')}` : '';
+                    const sortYear = f.marr.date ? (parseInt(getYear(f.marr.date)) || 9999) : 9999;
+                    spouseList.push({ id: spouse.id, name: spouse.name, info: metaStr, year: sortYear });
+                }
+            }
+        });
+        spouseList.sort((a,b) => a.year - b.year);
+        let spousesHTML = '';
+        if (spouseList.length > 0) {
+            spousesHTML = `<div class="spouse-section"><div class="spouse-title">${t('card.spouses')}</div>${spouseList.map(s => `<div class="spouse-row" onclick="render7GenView('${s.id}')" title="${t('tooltips.profileView')}"><span class="spouse-name">${toTitleCase(s.name)}</span>${s.info ? `<span class="spouse-meta">${s.info}</span>` : ''}</div>`).join('')}</div>`;
+        }
+        const bDate = formatDateLocalized(p.birth.date) || '-'; const dDate = formatDateLocalized(p.death.date) || '-'; const avClass = getAvatarClass(p.sex);
+        const isFav = FAVORITES.has(p.id); const favIcon = isFav ? '★' : '☆'; const favClass = isFav ? 'active' : '';
+        const fsHtml = p.fsId ? `<a href="https://www.familysearch.org/tree/person/details/${p.fsId}" target="_blank" class="focus-fsid" title="${t('tooltips.fs')}">Familysearch: ${p.fsId} ↗</a>` : '';
+        let nameHtml = p.surname ? `<span class="name-given">${toTitleCase(p.given)}</span><span class="name-surname">${toTitleCase(p.surname)}</span>` : `<span class="name-given">${toTitleCase(p.name)}</span>`;
+        card.innerHTML = `<div class="focus-banner"><div class="focus-fav-btn ${favClass}" id="profileFavBtn" onclick="toggleFavorite('${p.id}')">${favIcon}</div><div class="focus-avatar-large ${avClass}">${getAvatarSVG(p.sex)}</div></div><div class="focus-body"><div class="focus-name">${nameHtml}</div><div class="name-separator"></div>${fsHtml}<div style="margin-top:4px; margin-bottom: 20px;"><span class="focus-id">GED: ${p.id}</span></div><div class="vital-stats"><div class="vital-column" onclick="navigateToCalendarDate('${p.birth.date ? p.birth.date.replace(/'/g, "\\'") : ''}')" title="${t('tooltips.calendarView')}"><span class="vital-label">${t('card.birt')}</span><span class="vital-date">${bDate}</span><div class="vital-place">${formatPlace(p.birth.place)}</div></div><div class="vital-column" onclick="navigateToCalendarDate('${p.death.date ? p.death.date.replace(/'/g, "\\'") : ''}')" title="${t('tooltips.calendarView')}"><span class="vital-label">${t('card.deat')}</span><span class="vital-date">${dDate}</span><div class="vital-place">${formatPlace(p.death.place)}</div></div></div>${spousesHTML}${notes ? `<div class="focus-note">${notes}</div>` : ''}</div>`;
+        col.appendChild(card); return col;
+    }
+
+    function initData(gedContent) {
+        try {
+            const parsed = parseGEDCOM(gedContent);
+            DATA = parsed.inds ? parsed : {inds:{}, fams:{}};
+            if(Object.keys(DATA.inds).length === 0) throw new Error("No Data");
+            
+            // --- HIDE LANDING AND SHOW APP ---
+            document.getElementById('landingPage').style.display = 'none';
+            document.getElementById('appInterface').style.display = 'flex';
+            
+            const count = Object.keys(DATA.inds).length;
+            const statsStrong = document.querySelector('#statsBadge strong');
+            if(statsStrong) statsStrong.innerText = count;
+            document.getElementById('statsBadge').style.display = 'block';
+            updateStaticUI();
+            loadFavorites();
+            INITIAL_ID = Object.keys(DATA.inds)[0];
+            render7GenView(INITIAL_ID);
+        } catch(err) {
+            console.error(err);
+            document.getElementById('errorMsg').innerText = t('msg.loadErr');
+        }
+    }
+
+    // --- DEMO LOADER FUNCTION ---
+    function loadDemo() {
+        initData(DEMO_GEDCOM);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => { updateStaticUI(); updateCalendarHeaders(); });
+    const fileIn = document.getElementById('fileInput');
+    if(fileIn) {
+        fileIn.addEventListener('change', (e) => {
+            const f = e.target.files[0]; if(!f) return;
+            const r = new FileReader();
+            r.onload = (ev) => initData(ev.target.result);
+            r.onerror = () => { document.getElementById('errorMsg').innerText = t('msg.readErr'); };
+            r.readAsText(f);
+        });
+    }
+
+    const btnBack = document.getElementById('btnBack');
+    if(btnBack) {
+        btnBack.onclick = () => { if(HISTORY_STACK.length > 0) { const prevId = HISTORY_STACK.pop(); IS_NAVIGATING_BACK = true; render7GenView(prevId); } };
+    }
+    const btnHome = document.getElementById('btnHome');
+    if(btnHome) {
+        btnHome.onclick = () => { if(INITIAL_ID) { HISTORY_STACK = []; IS_NAVIGATING_BACK = true; const searchInput = document.getElementById('searchInput'); if(searchInput) searchInput.value = ''; render7GenView(INITIAL_ID); } };
+    }
+    const btnToday = document.getElementById('btnToday');
+    if(btnToday) {
+        btnToday.onclick = () => { const now = new Date(); const d = now.getDate(); const m = now.getMonth(); const todayId = `cal-row-${m}-${d}`; const todayEl = document.getElementById(todayId); if (todayEl) { todayEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); todayEl.classList.add('flash-highlight'); setTimeout(() => todayEl.classList.remove('flash-highlight'), 2000); } else { scrollToMonth(m); } };
+    }
+
+    const searchIn = document.getElementById('searchInput'); 
+    const resBox = document.getElementById('searchResults');
+    if(searchIn && resBox) {
+        searchIn.addEventListener('input', (e) => {
+            const q = e.target.value.toLowerCase(); resBox.innerHTML = '';
+            if(q.length < 2) { resBox.style.display='none'; return; }
+            const matches = Object.values(DATA.inds).filter(p => p.name.toLowerCase().includes(q));
+            matches.slice(0, 15).forEach(p => {
+                const d = document.createElement('div'); d.className = 'result-item';
+                const bY = getYear(p.birth.date); const dY = getYear(p.death.date); const time = dY ? `${bY} - ${dY}` : bY;
+                d.innerHTML = `<span>${toTitleCase(p.name)}</span> <span style="opacity:0.6">${time}</span>`;
+                d.onclick = () => { render7GenView(p.id); resBox.style.display='none'; if(searchIn) searchIn.value = ''; };
+                resBox.appendChild(d);
+            });
+            resBox.style.display = matches.length ? 'block' : 'none';
+        });
+    }
+
+    const btnCalendar = document.getElementById('btnCalendar');
+    const stageContainer = document.getElementById('stageContainer');
+    const calendarStage = document.getElementById('calendarStage');
+    const timelineUI = document.getElementById('timelineUI'); 
+    const searchWrapper = document.getElementById('searchWrapper');
+    const monthNavWrapper = document.getElementById('monthNavWrapper');
+    let IS_CALENDAR_MODE = false;
+
+    function setupCalendarObserver() {
+        if(calendarObserver) calendarObserver.disconnect();
+        if(!calendarStage) return;
+        const options = { root: calendarStage, rootMargin: '-70px 0px -70% 0px', threshold: 0 };
+        calendarObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) { const mName = entry.target.dataset.name; const titleEl = document.getElementById('dynamicMonthTitle'); if(titleEl && mName) titleEl.innerText = mName; } });
+        }, options);
+        document.querySelectorAll('.cal-month-block').forEach(el => calendarObserver.observe(el));
+    }
+
+    if(btnCalendar) {
+        btnCalendar.onclick = () => {
+            IS_CALENDAR_MODE = !IS_CALENDAR_MODE;
+            const titleSuffix = document.getElementById('appTitleSuffix'); 
+            const dynTitle = document.getElementById('dynamicMonthTitle');
+            if (IS_CALENDAR_MODE) {
+                if(stageContainer) stageContainer.style.display = 'none'; 
+                if(timelineUI) timelineUI.style.display = 'none'; 
+                if(calendarStage) calendarStage.style.display = 'flex';
+                const btnBack = document.getElementById('btnBack'); if(btnBack) btnBack.style.display = 'none';
+                const btnHome = document.getElementById('btnHome'); if(btnHome) btnHome.style.display = 'none';
+                const statsBadge = document.getElementById('statsBadge'); if(statsBadge) statsBadge.style.display = 'none';
+                const btnToday = document.getElementById('btnToday'); if(btnToday) btnToday.style.display = 'block'; 
+                if(searchWrapper) searchWrapper.style.display = 'none'; 
+                if(monthNavWrapper) monthNavWrapper.style.display = 'flex'; 
+                if(dynTitle) dynTitle.style.display = 'block'; 
+                if(titleSuffix) {
+                    titleSuffix.innerText = 'Calendar'; 
+                    titleSuffix.style.color = 'var(--fav-gold)';
+                }
+                btnCalendar.innerText = '🌳'; 
+                btnCalendar.title = t('tooltips.tree'); 
+                renderCalendar(); 
+                setupCalendarObserver(); 
+                setTimeout(() => { 
+                    const now = new Date(); 
+                    const d = now.getDate(); 
+                    const m = now.getMonth(); 
+                    const todayId = `cal-row-${m}-${d}`; 
+                    const todayEl = document.getElementById(todayId); 
+                    if(todayEl) { 
+                        todayEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
+                        todayEl.classList.add('flash-highlight'); 
+                        setTimeout(() => todayEl.classList.remove('flash-highlight'), 2000); 
+                    } else { 
+                        scrollToMonth(m); 
+                    } 
+                }, 100);
+            } else {
+                if(calendarStage) calendarStage.style.display = 'none'; 
+                if(stageContainer) stageContainer.style.display = 'flex'; 
+                if(timelineUI) timelineUI.style.display = 'flex'; 
+                const btnBack = document.getElementById('btnBack'); if(btnBack) btnBack.style.display = '';
+                const btnHome = document.getElementById('btnHome'); if(btnHome) btnHome.style.display = '';
+                const statsBadge = document.getElementById('statsBadge'); if(statsBadge) statsBadge.style.display = 'block';
+                const btnToday = document.getElementById('btnToday'); if(btnToday) btnToday.style.display = 'none'; 
+                if(searchWrapper) searchWrapper.style.display = 'flex'; 
+                if(monthNavWrapper) monthNavWrapper.style.display = 'none'; 
+                if(dynTitle) dynTitle.style.display = 'none'; 
+                if(titleSuffix) {
+                    titleSuffix.innerText = 'Explorer'; 
+                    titleSuffix.style.color = '';
+                }
+                btnCalendar.innerText = '📅'; 
+                btnCalendar.title = t('tooltips.calendar'); 
+                if(CURRENT_ID) render7GenView(CURRENT_ID);
+            }
+        };
+    }
+
+    function renderCalendar() {
+        const content = document.getElementById('calendarContent'); 
+        if(!content) return;
+        content.innerHTML = '';
+        const now = new Date(); const todayDay = now.getDate(); const todayMonth = now.getMonth(); 
+        const monthNames = TRANSLATIONS.ru.monthNames;
+        const events = Array(12).fill(null).map(() => Array(32).fill(null).map(() => ({ b: [], m: [], d: [] })));
+        Object.values(DATA.inds).forEach(p => {
+            const b = parseGedDateDayMonth(p.birth.date); if (b) events[b.m][b.d].b.push({ name: p.name, year: b.y, id: p.id });
+            const d = parseGedDateDayMonth(p.death.date); if (d) events[d.m][d.d].d.push({ name: p.name, year: d.y, id: p.id });
+        });
+        Object.values(DATA.fams).forEach(f => {
+            const m = parseGedDateDayMonth(f.marr.date);
+            if (m) {
+                const h = DATA.inds[f.husb] ? DATA.inds[f.husb].name : '?'; 
+                const w = DATA.inds[f.wife] ? DATA.inds[f.wife].name : '?';
+                events[m.m][m.d].m.push({ name: `${h} & ${w}`, year: m.y, id: f.husb || f.wife });
+            }
+        });
+        monthNames.forEach((mName, mIdx) => {
+            let hasEventsInMonth = false; let monthRows = '';
+            for (let day = 1; day <= 31; day++) {
+                const dayEv = events[mIdx][day]; if (!dayEv) continue; 
+                const isToday = (mIdx === todayMonth && day === todayDay);
+                const hasEvents = (dayEv.b.length > 0 || dayEv.m.length > 0 || dayEv.d.length > 0);
+                if (!hasEvents && !isToday) continue;
+                hasEventsInMonth = true;
+                const rowClass = isToday ? 'cal-row is-today cal-grid-def' : 'cal-row cal-grid-def';
+                const specificRowId = `cal-row-${mIdx}-${day}`;
+                const sortByYear = (a, b) => (parseInt(a.year) || 9999) - (parseInt(b.year) || 9999);
+                dayEv.b.sort(sortByYear); dayEv.m.sort(sortByYear); dayEv.d.sort(sortByYear);
+                const makeBadges = (list, typeClass) => list.map(e => `<div class="cal-event ${typeClass}" onclick="openFromCalendar('${e.id}')"><span>${toTitleCase(e.name)}</span><span class="cal-year">${e.year}</span></div>`).join('');
+                monthRows += `<div class="${rowClass}" id="${specificRowId}"><div class="cal-day cal-col-center">${day}</div><div class="cal-cell cal-col-left">${makeBadges(dayEv.b, 'type-birth')}</div><div class="cal-cell cal-col-left">${makeBadges(dayEv.d, 'type-death')}</div><div class="cal-cell cal-col-left">${makeBadges(dayEv.d, 'type-death')}</div></div>`;
+            }
+            if (hasEventsInMonth) { content.innerHTML += `<div class="cal-month-block" id="cal-month-${mIdx}" data-name="${mName}"><div class="cal-month-title">${mName}</div>${monthRows}</div>`; }
+        });
+        if (content.innerHTML === '') content.innerHTML = `<div style="padding:40px; text-align:center; opacity:0.6;">${t('msg.noEvents')}</div>`;
+    }
+
+    function scrollToMonth(monthIndex) { const el = document.getElementById(`cal-month-${monthIndex}`); if(el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    function openFromCalendar(id) {
+        if (!id) return; 
+        IS_CALENDAR_MODE = false; 
+        if(calendarObserver) calendarObserver.disconnect();
+        const calendarStage = document.getElementById('calendarStage');
+        const stageContainer = document.getElementById('stageContainer');
+        const timelineUI = document.getElementById('timelineUI');
+        if(calendarStage) calendarStage.style.display = 'none'; 
+        if(stageContainer) stageContainer.style.display = 'flex'; 
+        if(timelineUI) timelineUI.style.display = 'flex';
+        const btnBack = document.getElementById('btnBack'); if(btnBack) btnBack.style.display = '';
+        const btnHome = document.getElementById('btnHome'); if(btnHome) btnHome.style.display = '';
+        const statsBadge = document.getElementById('statsBadge'); if(statsBadge) statsBadge.style.display = 'block';
+        const btnToday = document.getElementById('btnToday'); if(btnToday) btnToday.style.display = 'none'; 
+        const searchWrapper = document.getElementById('searchWrapper'); if(searchWrapper) searchWrapper.style.display = 'flex'; 
+        const monthNavWrapper = document.getElementById('monthNavWrapper'); if(monthNavWrapper) monthNavWrapper.style.display = 'none'; 
+        const dynTitle = document.getElementById('dynamicMonthTitle'); if(dynTitle) dynTitle.style.display = 'none'; 
+        const titleSuffix = document.getElementById('appTitleSuffix'); 
+        if(titleSuffix) {
+            titleSuffix.innerText = 'Explorer'; 
+            titleSuffix.style.color = '';
+        }
+        const btnCalendar = document.getElementById('btnCalendar');
+        if(btnCalendar) {
+            btnCalendar.innerText = '📅'; 
+            btnCalendar.title = t('tooltips.calendar');
+        }
+        render7GenView(id);
+    }
+</script>
+</body>
+</html>
